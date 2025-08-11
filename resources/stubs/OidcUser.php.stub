@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class OidcUser extends Authenticatable
+{
+    protected $table = 'oidc_users';
+    public $timestamps = true;
+    public $incrementing = false;
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'id',
+        'name',
+        'email',
+        'principalName',
+        'username',
+        'token',
+    ];
+
+    protected $casts = [
+        'id' => 'string',
+        'name' => 'string',
+        'email' => 'string',
+        'principalName' => 'string',
+        'username' => 'string',
+        'token' => 'string',
+    ];
+
+    // You can add relationships or helpers as needed.
+}
+
+
+
