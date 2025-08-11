@@ -92,6 +92,25 @@ Joeystowe\MsGraphApi\LoggedInUser::userAttribute('principalName')
 
 
 
+#### Customizing the user model used by the OIDC guard
+
+By default, this package uses `Joeystowe\MsGraphApi\Models\OidcUser` and also registers an `oidc` guard and `oidc_users` provider for you. If you would like to customize the model in your application (e.g., add fields or behaviors), you can publish a stub model and point the package config to your class:
+
+```bash
+php artisan vendor:publish --tag=ms-graph-api-model
+php artisan vendor:publish --tag=ms-graph-api-config
+php artisan vendor:publish --tag=ms-graph-api-migrations
+```
+
+This will create `app/Models/OidcUser.php` and `config/ms-graph-api.php`. Update `config/ms-graph-api.php` to reference your application model:
+
+```php
+// config/ms-graph-api.php
+'user_model' => App\Models\OidcUser::class,
+```
+
+The authentication callback respects this configuration and uses standard Eloquent `updateOrCreate(['id' => ...], [...])` to persist the user, so no special method is required on your model. By default the package auto-loads its migration; if you need to customize it, publish with `--tag=ms-graph-api-migrations` and edit in your app.
+
 #### Logging Out
 Simply hit the '/logout' route to log the user out. After logging out from MS the user will be redirected to a '/postLogout' page. Be sure to set your APP_URL correctly so the "log back in" url will work correctly.
 

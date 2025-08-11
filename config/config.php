@@ -4,11 +4,16 @@
  * You can place your custom package configuration in here.
  */
 return [
-	'azure' => [
-		'client_id' => env('AZURE_CLIENT_ID'),
-		'client_secret' => env('AZURE_CLIENT_SECRET'),
-		'redirect' => env('AZURE_REDIRECT_URI'),
-		'tenant' => env('AZURE_TENANT_ID'),
-		'proxy' => env('PROXY')  // optionally
-	],
+    'azure' => [
+        'client_id' => env('AZURE_CLIENT_ID'),
+        'client_secret' => env('AZURE_CLIENT_SECRET'),
+        'redirect' => env('AZURE_REDIRECT_URI'),
+        'tenant' => env('AZURE_TENANT_ID'),
+        'proxy' => env('PROXY')  // optionally
+    ],
+
+    // The Eloquent model class used for OIDC-authenticated users. You can publish
+    // a stub model and customize it in your application, then point this config
+    // value to your own class, e.g. App\Models\OidcUser::class
+    'user_model' => env('MS_GRAPH_USER_MODEL', Joeystowe\MsGraphApi\Models\OidcUser::class),
 ];
