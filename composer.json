@@ -1,11 +1,11 @@
 {
-    "name": "joeystowe/ms-graph-api",
-    "description": "Laravel MS Graph API",
+    "name": "ua-dev-team-packages/entra-oidc",
+    "description": "Entra OIDC package for Laravel",
     "keywords": [
-        "joeystowe",
-        "ms-graph-api"
+        "ua-dev-team-packages",
+        "entra-oidc"
     ],
-    "homepage": "https://github.com/joeystowe/ms-graph-api",
+    "homepage": "https://github.com/ua-dev-team-packages/entra-oidc",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -21,17 +21,19 @@
         "socialiteproviders/microsoft-azure": "^5.1"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.0",
-        "phpunit/phpunit": "^9.0"
+        "orchestra/testbench": "^8",
+        "pestphp/pest": "^2.34",
+        "pestphp/pest-plugin-laravel": "^2",
+        "phpunit/phpunit": "^10.5"
     },
     "autoload": {
         "psr-4": {
-            "Joeystowe\\MsGraphApi\\": "src"
+            "UaDevTeamPackages\\EntraOidc\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Joeystowe\\MsGraphApi\\Tests\\": "tests"
+            "UaDevTeamPackages\\EntraOidc\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -39,16 +41,16 @@
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Joeystowe\\MsGraphApi\\MsGraphApiServiceProvider"
-            ],
-            "aliases": {
-                "MsGraphApi": "Joeystowe\\MsGraphApi\\MsGraphCurrentUserApiFacade"
-            }
+                "UaDevTeamPackages\\EntraOidc\\MsGraphApiServiceProvider"
+            ]
         }
     }
 }

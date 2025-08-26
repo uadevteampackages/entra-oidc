@@ -1,8 +1,9 @@
 <?php
 
-namespace Joeystowe\MsGraphApi\Models;
+namespace UaDevTeamPackages\EntraOidc\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use UaDevTeamPackages\EntraOidc\Traits\ChecksEntraGroup;
 
 /**
  * OIDC-authenticated user representation.
@@ -13,6 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class OidcUser extends Authenticatable
 {
+    use ChecksEntraGroup;
     /**
      * The database table used by the model.
      */
@@ -55,7 +57,6 @@ class OidcUser extends Authenticatable
         'email',
         'principalName',
         'username',
-        'token',
     ];
 
     /**
@@ -68,52 +69,21 @@ class OidcUser extends Authenticatable
         'name' => 'string',
         'email' => 'string',
         'principalName' => 'string',
-        'bannerUsername' => 'string',
-        'token' => 'string',
+        'username' => 'string',
     ];
 
-    /**
-     * Build an instance from a plain array of attributes.
-     */
-    public static function fromArray(array $attributes): self
-    {
-        $instance = static::query()->find($attributes['id'] ?? null) ?? new self();
-        $instance->unguard();
-        $instance->fill($attributes);
-        $instance->save();
-        $instance->reguard();
-        return $instance;
-    }
+    // /**
+    //  * Build an instance from a plain array of attributes.
+    //  */
+    // public static function fromArray(array $attributes): self
+    // {
+    //     $instance = static::query()->find($attributes['id'] ?? null) ?? new self();
+    //     $instance->unguard();
+    //     $instance->fill($attributes);
+    //     $instance->save();
+    //     $instance->reguard();
+    //     return $instance;
+    // }
 
-    /**
-     * Check if the current user is a member (transitively) of the given Entra group.
-     */
-    public function isInEntraGroup(string $groupId): bool
-    {
-        $rawToken = (string)($this->token ?? '');
-        if ($rawToken === '') {
-            return false;
-        }
-
-        $authHeader = str_starts_with(strtolower($rawToken), 'bearer ')
-            ? $rawToken
-            : 'Bearer ' . $rawToken;
-
-        $response = \Illuminate\Support\Facades\Http::withHeaders([
-            'Authorization' => $authHeader,
-        ])->post('https://graph.microsoft.com/v1.0/me/checkMemberGroups', [
-            'groupIds' => [$groupId],
-        ]);
-
-        if ($response->failed()) {
-            \Illuminate\Support\Facades\Log::warning('Graph API checkMemberGroups failed', [
-                'status' => $response->status(),
-                'body' => $response->json(),
-            ]);
-            return false;
-        }
-
-        $memberGroupIds = (array)($response->json('value') ?? []);
-        return in_array($groupId, $memberGroupIds, true);
-    }
+    // isInEntraGroup now provided by ChecksEntraGroup trait
 }

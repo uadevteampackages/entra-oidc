@@ -102,12 +102,32 @@ php artisan vendor:publish --tag=ms-graph-api-config
 php artisan vendor:publish --tag=ms-graph-api-migrations
 ```
 
+Or publish all assets
+
+```bash
+php artisan vendor:publish --provider="Joeystowe\MsGraphApi\MsGraphApiServiceProvider"
+//or
+php artisan vendor:publish --tag=ms-graph-api-config --tag=assets --tag=ms-graph-api-migrations --tag=ms-graph-api-model
+```
+
+
 This will create `app/Models/OidcUser.php` and `config/ms-graph-api.php`. Update `config/ms-graph-api.php` to reference your application model:
 
 ```php
 // config/ms-graph-api.php
 'user_model' => App\Models\OidcUser::class,
 ```
+
+Update .env
+
+```php
+AUTH_GUARD="oidc"
+AZURE_TENANT_ID=""
+AZURE_CLIENT_ID=""
+AZURE_CLIENT_SECRET=""
+AZURE_REDIRECT_URI="${APP_URL}/auth/callback"
+```
+
 
 The authentication callback respects this configuration and uses standard Eloquent `updateOrCreate(['id' => ...], [...])` to persist the user, so no special method is required on your model. By default the package auto-loads its migration; if you need to customize it, publish with `--tag=ms-graph-api-migrations` and edit in your app.
 
@@ -117,6 +137,52 @@ Simply hit the '/logout' route to log the user out. After logging out from MS th
 You will also need to publish the assets for the postLogout page to be fully functional:
 ```bash
 php artisan vendor:publish --tag=assets --ansi --force
+```
+
+#### Local development proxy user (impersonation)
+For local development you can have the middleware short-circuit the Azure login and authenticate as a proxy user defined in your `.env`.
+
+- Only active when `app()->environment('local')` is true and `MS_GRAPH_PROXY_ENABLED=true`.
+- The proxy user is persisted (via your OIDC user model) and logged in with the `oidc` guard.
+- If you need Microsoft Graph calls to work locally, provide a valid delegated token in `MS_GRAPH_PROXY_TOKEN`. Otherwise, Graph calls may 401.
+ - Alternatively, you can configure application permissions using client credentials to query Graph for any user's groups in local/proxy mode.
+
+Add to your `.env` (local only):
+
+```env
+MS_GRAPH_PROXY_ENABLED=true
+MS_GRAPH_PROXY_PRINCIPAL=jdoe@contoso.com
+MS_GRAPH_PROXY_NAME="John Doe (Dev)"
+# Optional overrides
+# MS_GRAPH_PROXY_EMAIL=jdoe@contoso.com
+# MS_GRAPH_PROXY_ID=proxy-jdoe
+# MS_GRAPH_PROXY_TOKEN=
+# Optional: Application permissions (client credentials) for Graph in local/proxy mode
+# Requires Graph app with appropriate app roles (e.g., User.Read.All, Group.Read.All)
+MS_GRAPH_APP_ENABLED=true
+MS_GRAPH_APP_TENANT=<tenant_id>
+MS_GRAPH_APP_CLIENT_ID=<app_client_id>
+MS_GRAPH_APP_CLIENT_SECRET=<app_client_secret>
+```
+
+Configuration is defined under `config/ms-graph-api.php`:
+
+```php
+'proxy' => [
+    'enabled'   => env('MS_GRAPH_PROXY_ENABLED', false),
+    'principal' => env('MS_GRAPH_PROXY_PRINCIPAL'),
+    'email'     => env('MS_GRAPH_PROXY_EMAIL'),
+    'name'      => env('MS_GRAPH_PROXY_NAME', 'Dev User'),
+    'id'        => env('MS_GRAPH_PROXY_ID'),
+    'token'     => env('MS_GRAPH_PROXY_TOKEN'),
+],
+
+'client_credentials' => [
+    'enabled'       => env('MS_GRAPH_APP_ENABLED', false),
+    'tenant'        => env('MS_GRAPH_APP_TENANT', env('AZURE_TENANT_ID')),
+    'client_id'     => env('MS_GRAPH_APP_CLIENT_ID'),
+    'client_secret' => env('MS_GRAPH_APP_CLIENT_SECRET'),
+],
 ```
 
 ### Calling Graph API

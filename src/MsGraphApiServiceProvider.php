@@ -1,9 +1,9 @@
 <?php
 
-namespace Joeystowe\MsGraphApi;
+namespace UaDevTeamPackages\EntraOidc;
 
 use Illuminate\Support\ServiceProvider;
-use Joeystowe\MsGraphApi\Http\Middleware\MicrosoftAuthMiddleware;
+use UaDevTeamPackages\EntraOidc\Http\Middleware\MicrosoftAuthMiddleware;
 
 class MsGraphApiServiceProvider extends ServiceProvider
 {
@@ -77,27 +77,6 @@ class MsGraphApiServiceProvider extends ServiceProvider
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'ms-graph-api');
 
-        // Register the main class to use with the facade
-        $this->app->singleton('ms-graph-current-user-api', function () {
-            // Prefer token from the oidc guard if present
-            $token = '';
-            if (\Illuminate\Support\Facades\Auth::guard('oidc')->check()) {
-                $token = (string)(\Illuminate\Support\Facades\Auth::guard('oidc')->user()->token ?? '');
-            } else {
-                $token = (string)(\Illuminate\Support\Facades\Auth::user()->token ?? '');
-            }
-
-            if (!empty($token) && !str_starts_with(strtolower($token), 'bearer ')) {
-                $token = 'Bearer ' . $token;
-            }
-
-            return new MsGraphCurrentUserApi($token);
-        });
-
-        $this->app->singleton('logged-in-user', function () {
-            return new \Joeystowe\MsGraphApi\LoggedInUser;
-        });
-
         // Ensure guard/provider config are in place during registration as well
         $this->registerOidcGuardAndProvider();
     }
@@ -106,7 +85,7 @@ class MsGraphApiServiceProvider extends ServiceProvider
     {
         // Add eloquent provider for OIDC users if not provided by host app
         if (!config()->has('auth.providers.oidc_users')) {
-            $model = config('ms-graph-api.user_model', \Joeystowe\MsGraphApi\Models\OidcUser::class);
+            $model = config('ms-graph-api.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
             config(['auth.providers.oidc_users' => [
                 'driver' => 'eloquent',
                 'model' => $model,

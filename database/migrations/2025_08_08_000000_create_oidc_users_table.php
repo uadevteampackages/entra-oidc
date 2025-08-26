@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->string('email')->nullable();
             $table->string('principalName')->nullable();
             $table->string('username')->nullable();
-            $table->text('token')->nullable();
+            // $table->text('token')->nullable();
             $table->timestamps();
         });
     }
