@@ -9,10 +9,10 @@ class MsGraphAppClient
 {
     public static function isEnabled(): bool
     {
-        return (bool) config('ms-graph-api.client_credentials.enabled')
-            && (string) config('ms-graph-api.client_credentials.client_id') !== ''
-            && (string) config('ms-graph-api.client_credentials.client_secret') !== ''
-            && (string) config('ms-graph-api.client_credentials.tenant') !== '';
+        return (bool) config('entra-oidc.client_credentials.enabled')
+            && (string) config('entra-oidc.client_credentials.client_id') !== ''
+            && (string) config('entra-oidc.client_credentials.client_secret') !== ''
+            && (string) config('entra-oidc.client_credentials.tenant') !== '';
     }
 
     public static function getAccessToken(): ?string
@@ -27,25 +27,21 @@ class MsGraphAppClient
             return $cached;
         }
 
-        $tenant = (string) config('ms-graph-api.client_credentials.tenant');
-        $clientId = (string) config('ms-graph-api.client_credentials.client_id');
-        $clientSecret = (string) config('ms-graph-api.client_credentials.client_secret');
+        $tenant = (string) config('entra-oidc.client_credentials.tenant');
+        $clientId = (string) config('entra-oidc.client_credentials.client_id');
+        $clientSecret = (string) config('entra-oidc.client_credentials.client_secret');
 
-        try {
-            $response = Http::asForm()
-                ->timeout(5)
-                ->retry(3, 100)
-                ->post("https://login.microsoftonline.com/{$tenant}/oauth2/v2.0/token", [
-                    'client_id' => $clientId,
-                    'client_secret' => $clientSecret,
-                    'grant_type' => 'client_credentials',
-                    'scope' => 'https://graph.microsoft.com/.default',
-                ])
-                ->throw();
-        } catch (\Exception $e) {
-            logger()->error('Failed to get access token', ['exception' => $e]);
-            return null;
-        }
+        $response = Http::asForm()
+            ->timeout(5)
+            ->retry(3, 100)
+            ->post("https://login.microsoftonline.com/{$tenant}/oauth2/v2.0/token", [
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+                'grant_type' => 'client_credentials',
+                'scope' => 'https://graph.microsoft.com/.default',
+            ]);
+
+
 
         $accessToken = (string) ($response->json('access_token') ?? '');
         $expiresIn = (int) ($response->json('expires_in') ?? 3600);
@@ -74,6 +70,7 @@ class MsGraphAppClient
                 '$select' => 'id',
             ]);
 
+
         if ($response->failed()) {
             return null;
         }
@@ -90,13 +87,21 @@ class MsGraphAppClient
 
         $response = Http::withToken($token)
             ->timeout(5)
-            ->retry(3, 100)
+            ->retry(3, 100, throw: false)
             ->post("https://graph.microsoft.com/v1.0/users/{$userId}/checkMemberGroups", [
                 'groupIds' => [$groupId],
             ]);
 
-        if ($response->failed()) {
+        if ($response->status() === 400) {
             return false;
+        }
+
+        if ($response->failed()) {
+            logger()->warning('Graph API checkMemberGroups failed', [
+                'status' => $response->status(),
+                'body' => $response->json(),
+            ]);
+            throw new \Exception('Failed to check if user is in group');
         }
 
         $ids = (array) ($response->json('value') ?? []);

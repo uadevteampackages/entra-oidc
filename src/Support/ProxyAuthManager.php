@@ -10,12 +10,12 @@ class ProxyAuthManager
     public static function isLocalHost(): bool
     {
         return app()->environment(['local', 'testing'])
-            && Str::contains((string) config('ms-graph-api.azure.redirect'), 'localhost');
+            && Str::contains((string) config('entra-oidc.azure.redirect'), 'localhost');
     }
 
     public static function isEnabled(): bool
     {
-        return (bool) config('ms-graph-api.proxy.enabled');
+        return (bool) config('entra-oidc.proxy.enabled');
     }
 
     public static function isProxySession(): bool
@@ -25,30 +25,36 @@ class ProxyAuthManager
 
     public static function getProxyPrincipal(): string
     {
-        return (string) config('ms-graph-api.proxy.principal', '');
+        return (string) config('entra-oidc.proxy.principal', '');
     }
 
+    /**
+     * Determine if application-permissions Graph calls are allowed in proxy mode.
+     * Requires: non-empty proxy principal, proxy enabled, local/testing environment,
+     * and valid client credentials (checked by MsGraphAppClient::isEnabled()).
+     */
     public static function canUseAppCredentials(): bool
     {
-        return self::isLocalHost()
+        $principal = self::getProxyPrincipal();
+
+        return $principal !== ''
             && self::isEnabled()
-            && \UaDevTeamPackages\EntraOidc\MsGraphAppClient::isEnabled()
-            && (bool) config('ms-graph-api.client_credentials.enabled')
-            && self::getProxyPrincipal() !== '';
+            && self::isLocalHost()
+            && \UaDevTeamPackages\EntraOidc\MsGraphAppClient::isEnabled();
     }
 
     public static function loginProxyUser(): void
     {
-        $principal = (string) config('ms-graph-api.proxy.principal', '');
+        $principal = (string) config('entra-oidc.proxy.principal', '');
         if ($principal === '') {
             return;
         }
 
-        $modelClass = config('ms-graph-api.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
-        $email     = (string) (config('ms-graph-api.proxy.email') ?? $principal);
-        $name      = (string) (config('ms-graph-api.proxy.name') ?? 'Proxy User');
+        $modelClass = config('entra-oidc.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
+        $email     = (string) (config('entra-oidc.proxy.email') ?? $principal);
+        $name      = (string) (config('entra-oidc.proxy.name') ?? 'Proxy User');
         $username  = strtolower(explode('@', $principal)[0] ?? $principal);
-        $id        = (string) (config('ms-graph-api.proxy.id') ?? 'proxy-' . md5($principal));
+        $id        = (string) (config('entra-oidc.proxy.id') ?? 'proxy-' . md5($principal));
 
         if (Auth::guard('oidc')->check() && !session()->has('ms:real-user-id')) {
             session()->put('ms:real-user-id', Auth::guard('oidc')->id());
@@ -83,7 +89,7 @@ class ProxyAuthManager
         session()->forget('ms:is-proxy');
 
         if (!empty($originalUserId)) {
-            $modelClass = config('ms-graph-api.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
+            $modelClass = config('entra-oidc.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
             $originalUser = $modelClass::query()->find($originalUserId);
             if ($originalUser) {
                 Auth::guard('oidc')->login($originalUser);

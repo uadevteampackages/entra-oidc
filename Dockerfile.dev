@@ -13,6 +13,10 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 USER root
 
+# Add a one-liner config snippet that disables AIO
+RUN mkdir -p /etc/nginx/conf.d \
+    && echo "aio off;" > /etc/nginx/conf.d/no-aio.conf
+
 #Install OS Modules
 RUN apk --no-cache upgrade \
 	&& apk --no-cache add \

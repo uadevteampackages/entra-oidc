@@ -9,8 +9,7 @@ use UaDevTeamPackages\EntraOidc\Traits\ChecksEntraGroup;
  * OIDC-authenticated user representation.
  *
  * This model is designed to be filled from the OIDC session payload and used
- * as a convenient typed container for user attributes. It does not assume a
- * backing database table and disables timestamps.
+ * as a convenient typed container for user attributes.
  */
 class OidcUser extends Authenticatable
 {

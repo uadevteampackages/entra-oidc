@@ -5,7 +5,7 @@ namespace UaDevTeamPackages\EntraOidc;
 use Illuminate\Support\ServiceProvider;
 use UaDevTeamPackages\EntraOidc\Http\Middleware\MicrosoftAuthMiddleware;
 
-class MsGraphApiServiceProvider extends ServiceProvider
+class EntraOidcServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -15,7 +15,7 @@ class MsGraphApiServiceProvider extends ServiceProvider
         /*
          * Optional methods to load your package assets
          */
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'ms-graph-api');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'entra-oidc');
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
@@ -29,15 +29,15 @@ class MsGraphApiServiceProvider extends ServiceProvider
         $router->aliasMiddleware('ms-auth', MicrosoftAuthMiddleware::class);
 
         // Explicitly set the azure service config so we use the package's config
-        config(['services.azure' => config('ms-graph-api.azure')]);
+        config(['services.azure' => config('entra-oidc.azure')]);
 
         // Register an OIDC guard and provider if the host app hasn't defined them
         $this->registerOidcGuardAndProvider();
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/config.php' => config_path('ms-graph-api.php'),
-            ], 'ms-graph-api-config');
+                __DIR__ . '/../resources/stubs/entra-oidc.php.stub' => config_path('entra-oidc.php'),
+            ], 'entra-oidc-config');
 
             // Publishing the views.
             /*$this->publishes([
@@ -46,13 +46,13 @@ class MsGraphApiServiceProvider extends ServiceProvider
 
             // Publishing assets.
             $this->publishes([
-                __DIR__ . '/../resources/assets' => public_path('vendor/ms-graph-api'),
-            ], 'assets');
+                __DIR__ . '/../resources/assets' => public_path('vendor/entra-oidc'),
+            ], 'entra-oidc-assets');
 
             // Optionally publish migrations so apps can customize schema
             $this->publishes([
                 __DIR__ . '/../database/migrations' => database_path('migrations'),
-            ], 'ms-graph-api-migrations');
+            ], 'entra-oidc-migrations');
 
             // Publishing the translation files.
             /*$this->publishes([
@@ -62,7 +62,15 @@ class MsGraphApiServiceProvider extends ServiceProvider
             // Publish a customizable OIDC user model stub
             $this->publishes([
                 __DIR__ . '/../resources/stubs/OidcUser.php.stub' => app_path('Models/OidcUser.php'),
-            ], 'ms-graph-api-model');
+            ], 'entra-oidc-model');
+
+            // One-tag publish: publish all package resources at once
+            $this->publishes([
+                __DIR__ . '/../resources/stubs/entra-oidc.php.stub' => config_path('entra-oidc.php'),
+                __DIR__ . '/../resources/assets' => public_path('vendor/entra-oidc'),
+                __DIR__ . '/../database/migrations' => database_path('migrations'),
+                __DIR__ . '/../resources/stubs/OidcUser.php.stub' => app_path('Models/OidcUser.php'),
+            ], 'entra-oidc-all');
 
             // Registering package commands.
             // $this->commands([]);
@@ -75,7 +83,7 @@ class MsGraphApiServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'ms-graph-api');
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'entra-oidc');
 
         // Ensure guard/provider config are in place during registration as well
         $this->registerOidcGuardAndProvider();
@@ -85,7 +93,7 @@ class MsGraphApiServiceProvider extends ServiceProvider
     {
         // Add eloquent provider for OIDC users if not provided by host app
         if (!config()->has('auth.providers.oidc_users')) {
-            $model = config('ms-graph-api.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
+            $model = config('entra-oidc.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
             config(['auth.providers.oidc_users' => [
                 'driver' => 'eloquent',
                 'model' => $model,

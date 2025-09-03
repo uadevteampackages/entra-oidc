@@ -36,10 +36,10 @@ test('isUserInGroup returns false when no app token available', function () {
 });
 
 test('getUserIdByPrincipal returns id on success', function () {
-    config()->set('ms-graph-api.client_credentials.enabled', true);
-    config()->set('ms-graph-api.client_credentials.tenant', 'common');
-    config()->set('ms-graph-api.client_credentials.client_id', 'id');
-    config()->set('ms-graph-api.client_credentials.client_secret', 'secret');
+    config()->set('entra-oidc.client_credentials.enabled', true);
+    config()->set('entra-oidc.client_credentials.tenant', 'common');
+    config()->set('entra-oidc.client_credentials.client_id', 'id');
+    config()->set('entra-oidc.client_credentials.client_secret', 'secret');
 
     Http::fake([
         'login.microsoftonline.com/*' => Http::response(['access_token' => 'tok', 'expires_in' => 3600], 200),
@@ -51,10 +51,10 @@ test('getUserIdByPrincipal returns id on success', function () {
 });
 
 test('isUserInGroup returns true when Graph includes the group', function () {
-    config()->set('ms-graph-api.client_credentials.enabled', true);
-    config()->set('ms-graph-api.client_credentials.tenant', 'common');
-    config()->set('ms-graph-api.client_credentials.client_id', 'id');
-    config()->set('ms-graph-api.client_credentials.client_secret', 'secret');
+    config()->set('entra-oidc.client_credentials.enabled', true);
+    config()->set('entra-oidc.client_credentials.tenant', 'common');
+    config()->set('entra-oidc.client_credentials.client_id', 'id');
+    config()->set('entra-oidc.client_credentials.client_secret', 'secret');
 
     $groupId = 'group-123';
 

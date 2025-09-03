@@ -48,7 +48,7 @@ test('callback logs in and sets session', function () {
 });
 
 test('group check calls Graph', function () {
-    $this->withSession(['entra_user_token' => 'abc123']);
+    $this->withSession(['entra_user_token' => 'abc123', 'entra_user_token_expires' => now()->addHours(1)]);
     Auth::guard('oidc')->login(new \UaDevTeamPackages\EntraOidc\Models\OidcUser([
         'id' => 'user-1',
         'name' => 'John Doe',

@@ -4,7 +4,7 @@ namespace UaDevTeamPackages\EntraOidc\Tests;
 
 use Laravel\Socialite\SocialiteServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use UaDevTeamPackages\EntraOidc\MsGraphApiServiceProvider;
+use UaDevTeamPackages\EntraOidc\EntraOidcServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -17,7 +17,7 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            MsGraphApiServiceProvider::class,
+            EntraOidcServiceProvider::class,
             SocialiteServiceProvider::class,
         ];
     }

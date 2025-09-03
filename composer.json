@@ -49,7 +49,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "UaDevTeamPackages\\EntraOidc\\MsGraphApiServiceProvider"
+                "UaDevTeamPackages\\EntraOidc\\EntraOidcServiceProvider"
             ]
         }
     }
