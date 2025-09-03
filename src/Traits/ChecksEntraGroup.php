@@ -42,7 +42,7 @@ trait ChecksEntraGroup
 
         // First check if the user token is set and not expired
         $rawToken = (string)(session()->get('entra_user_token') ?? '');
-        if (!$rawToken || $rawToken === '') {
+        if ($rawToken === '') {
             throw new \Exception('The user token is not set. Please login again.');
         } else if (session()->get('entra_user_token_expires') < now()) {
             throw new \Exception('The user token has expired. Please login again.');

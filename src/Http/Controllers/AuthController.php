@@ -8,11 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends BaseController
 {
-    public function callback()
+    public function callback(): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
     {
         try {
             Log::debug('auth callback called');
 
+            /** @var \SocialiteProviders\Manager\OAuth2\User $oauth_user */
             $oauth_user = \Laravel\Socialite\Facades\Socialite::driver('azure')->user();
 
             $username = explode('@', $oauth_user->user['userPrincipalName'] ?? '')[0];
@@ -52,7 +53,7 @@ class AuthController extends BaseController
         }
     }
 
-    public function logout()
+    public function logout(): \Illuminate\Http\RedirectResponse
     {
         Auth::guard('oidc')->logout();
         session()->invalidate();
@@ -63,7 +64,7 @@ class AuthController extends BaseController
         return redirect($azureLogoutUrl);
     }
 
-    public function postLogout()
+    public function postLogout(): \Illuminate\Contracts\View\View
     {
         return view('entra-oidc::logout');
     }
