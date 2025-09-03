@@ -1,0 +1,14 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    paths:
+        - src
+    tmpDir: build/phpstan
+    level: 6
+    checkMissingIterableValueType: true
+    checkGenericClassInNonGenericObjectType: true
+    scanFiles:
+        - vendor/nunomaduro/larastan/bootstrap.php
+    reportUnmatchedIgnoredErrors: true
+

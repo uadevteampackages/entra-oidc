@@ -91,20 +91,20 @@ class EntraOidcServiceProvider extends ServiceProvider
 
     protected function registerOidcGuardAndProvider(): void
     {
+        // Add a session guard using the OIDC provider if not present
+        if (!config()->has('auth.guards.oidc')) {
+            config(['auth.guards.oidc' => [
+                'driver' => 'session',
+                'provider' => 'oidc_users',
+            ]]);
+        }
+
         // Add eloquent provider for OIDC users if not provided by host app
         if (!config()->has('auth.providers.oidc_users')) {
             $model = config('entra-oidc.user_model', \UaDevTeamPackages\EntraOidc\Models\OidcUser::class);
             config(['auth.providers.oidc_users' => [
                 'driver' => 'eloquent',
                 'model' => $model,
-            ]]);
-        }
-
-        // Add a session guard using the OIDC provider if not present
-        if (!config()->has('auth.guards.oidc')) {
-            config(['auth.guards.oidc' => [
-                'driver' => 'session',
-                'provider' => 'oidc_users',
             ]]);
         }
     }
