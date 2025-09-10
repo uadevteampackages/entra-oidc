@@ -41,7 +41,7 @@ test('callback logs in and sets session', function () {
     $this->assertTrue(Auth::guard('oidc')->check());
     $this->assertSame('abc123', session('entra_user_token'));
     $this->assertSame('jdoe@contoso.com', Auth::guard('oidc')->user()->email);
-    $this->assertSame('jdoe@contoso.com', Auth::guard('oidc')->user()->principalName);
+    $this->assertSame('jdoe@contoso.com', Auth::guard('oidc')->user()->principal_name);
     $this->assertSame('jdoe', Auth::guard('oidc')->user()->username);
     $this->assertSame('John Doe', Auth::guard('oidc')->user()->name);
     $this->assertNotNull(session('entra_user_token_expires'));
@@ -53,7 +53,7 @@ test('group check calls Graph', function () {
         'id' => 'user-1',
         'name' => 'John Doe',
         'email' => 'jdoe@contoso.com',
-        'principalName' => 'jdoe@contoso.com',
+        'principal_name' => 'jdoe@contoso.com',
         'username' => 'jdoe',
     ]));
 

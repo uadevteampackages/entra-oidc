@@ -54,7 +54,7 @@ class OidcUser extends Authenticatable
         'id',
         'name',
         'email',
-        'principalName',
+        'principal_name',
         'username',
     ];
 
@@ -67,7 +67,7 @@ class OidcUser extends Authenticatable
         'id' => 'string',
         'name' => 'string',
         'email' => 'string',
-        'principalName' => 'string',
+        'principal_name' => 'string',
         'username' => 'string',
     ];
 

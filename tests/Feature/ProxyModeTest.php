@@ -20,7 +20,7 @@ test('proxy enabled logs in proxy user and marks proxy session', function () {
 
     $this->assertTrue(Auth::guard('oidc')->check());
     $user = Auth::guard('oidc')->user();
-    $this->assertSame('devuser@contoso.com', $user->principalName);
+    $this->assertSame('devuser@contoso.com', $user->principal_name);
     $this->assertSame('devuser', $user->username);
     $this->assertTrue((bool) session('ms:is-proxy'));
 });
@@ -31,7 +31,7 @@ test('proxy disabled restores original user when recorded', function () {
         'id' => 'user-1',
         'name' => 'Original User',
         'email' => 'orig@contoso.com',
-        'principalName' => 'orig@contoso.com',
+        'principal_name' => 'orig@contoso.com',
         'username' => 'orig',
     ]);
     $original->save();

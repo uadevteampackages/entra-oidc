@@ -26,7 +26,7 @@ class EntraOidcServiceProvider extends ServiceProvider
         });
 
         $router = $this->app->make(\Illuminate\Routing\Router::class);
-        $router->aliasMiddleware('ms-auth', MicrosoftAuthMiddleware::class);
+        $router->aliasMiddleware('oidc-auth', MicrosoftAuthMiddleware::class);
 
         // Explicitly set the azure service config so we use the package's config
         config(['services.azure' => config('entra-oidc.azure')]);
@@ -51,7 +51,7 @@ class EntraOidcServiceProvider extends ServiceProvider
 
             // Optionally publish migrations so apps can customize schema
             $this->publishes([
-                __DIR__ . '/../database/migrations' => database_path('migrations'),
+                __DIR__ . '/../database/test-migrations' => database_path('migrations'),
             ], 'entra-oidc-migrations');
 
             // Publishing the translation files.
@@ -68,7 +68,7 @@ class EntraOidcServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../resources/stubs/entra-oidc.php.stub' => config_path('entra-oidc.php'),
                 __DIR__ . '/../resources/assets' => public_path('vendor/entra-oidc'),
-                __DIR__ . '/../database/migrations' => database_path('migrations'),
+                __DIR__ . '/../database/test-migrations' => database_path('migrations'),
                 __DIR__ . '/../resources/stubs/OidcUser.php.stub' => app_path('Models/OidcUser.php'),
             ], 'entra-oidc-all');
 

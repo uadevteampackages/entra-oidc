@@ -66,7 +66,7 @@ class ProxyAuthManager
             [
                 'name' => $name,
                 'email' => $email,
-                'principalName' => $principal,
+                'principal_name' => $principal,
                 'username' => $username,
             ]
         );

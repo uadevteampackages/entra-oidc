@@ -1,6 +1,6 @@
 ## Entra OIDC for Laravel
 
-Lightweight Laravel package that adds Microsoft Entra ID (OIDC) authentication via Socialite, a cacheable controller-based callback/logout flow, an `ms-auth` middleware, a simple `OidcUser` model and optional helpers for Microsoft Graph (delegated and application permissions).
+Lightweight Laravel package that adds Microsoft Entra ID (OIDC) authentication via Socialite, a cacheable controller-based callback/logout flow, an `oidc-auth` middleware, a simple `OidcUser` model and optional helpers for Microsoft Graph (delegated and application permissions).
 
 ### Requirements
 - **PHP**: 8.1+
@@ -12,7 +12,7 @@ composer require ua-dev-team-packages/entra-oidc
 ```
 
 ### What you get
-- **Middleware**: `ms-auth` to protect routes and trigger the OIDC sign-in
+- **Middleware**: `oidc-auth` to protect routes and trigger the OIDC sign-in
 - **Routes** (registered in the `web` group):
   - `GET /auth/callback` – OIDC callback (controller-based; route cache friendly)
   - `GET /logout` – logs out locally and from Microsoft, then redirects to post-logout
@@ -45,16 +45,16 @@ Run migrations
 php artisan migrate
 ```
 
-## Protecting routes with ms-auth
+## Protecting routes with oidc-auth
 Apply the middleware to any routes that require sign-in.
 ```php
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('ms-auth')->group(function () {
+Route::middleware('oidc-auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'show']);
 });
 ```
-Do not apply `ms-auth` globally to the `web` group; the callback must remain publicly accessible.
+Do not apply `oidc-auth` globally to the `web` group; the callback must remain publicly accessible.
 
 ## Accessing the signed-in user
 ```php

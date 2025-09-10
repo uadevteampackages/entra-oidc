@@ -8,12 +8,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('oidc_users', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id')->uuid()->primary();
+            $table->string('principal_name')->unique();
+            $table->string('username')->unique();
             $table->string('name')->nullable();
             $table->string('email')->nullable();
-            $table->string('principalName')->nullable();
-            $table->string('username')->nullable();
-            // $table->text('token')->nullable();
             $table->timestamps();
         });
     }

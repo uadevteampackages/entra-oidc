@@ -30,7 +30,7 @@ class AuthController extends BaseController
                 [
                     'name' => $oauth_user->getName(),
                     'email' => $oauth_user->getEmail(),
-                    'principalName' => $oauth_user->user['userPrincipalName'] ?? null,
+                    'principal_name' => $oauth_user->user['userPrincipalName'] ?? null,
                     'username' => $username,
                 ]
             );
@@ -39,7 +39,7 @@ class AuthController extends BaseController
             session()->put('entra_user_token_expires', now()->addSeconds($oauth_user->expiresIn));
 
             Auth::guard('oidc')->login($user);
-            Log::info('user logged in', ['userId' => $user->id, 'upn' => $user->principalName]);
+            Log::info('user logged in', ['userId' => $user->id, 'upn' => $user->principal_name]);
 
             $redirectTo = session()->pull('sso_redirect_url', '/');
             Log::debug('redirecting to', ['redirectTo' => $redirectTo]);

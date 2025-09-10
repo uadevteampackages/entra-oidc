@@ -10,7 +10,7 @@ test('group check failure returns true', function () {
         'id' => 'user-1',
         'name' => 'John Doe',
         'email' => 'jdoe@contoso.com',
-        'principalName' => 'jdoe@contoso.com',
+        'principal_name' => 'jdoe@contoso.com',
         'username' => 'jdoe',
     ]));
 
@@ -32,7 +32,7 @@ test('group check failure returns false', function () {
         'id' => 'user-1',
         'name' => 'John Doe',
         'email' => 'jdoe@contoso.com',
-        'principalName' => 'jdoe@contoso.com',
+        'principal_name' => 'jdoe@contoso.com',
         'username' => 'jdoe',
     ]));
 
@@ -54,7 +54,7 @@ test('group check failure throws exception', function () {
         'id' => 'user-1',
         'name' => 'John Doe',
         'email' => 'jdoe@contoso.com',
-        'principalName' => 'jdoe@contoso.com',
+        'principal_name' => 'jdoe@contoso.com',
         'username' => 'jdoe',
     ]));
 
@@ -77,7 +77,7 @@ test('group check failure throws exception when token is expired', function () {
         'id' => 'user-1',
         'name' => 'John Doe',
         'email' => 'jdoe@contoso.com',
-        'principalName' => 'jdoe@contoso.com',
+        'principal_name' => 'jdoe@contoso.com',
         'username' => 'jdoe',
     ]));
 
@@ -96,7 +96,7 @@ test('group check failure throws exception when token is not set', function () {
         'id' => 'user-1',
         'name' => 'John Doe',
         'email' => 'jdoe@contoso.com',
-        'principalName' => 'jdoe@contoso.com',
+        'principal_name' => 'jdoe@contoso.com',
         'username' => 'jdoe',
     ]));
 

@@ -40,14 +40,14 @@ class TestCase extends BaseTestCase
 
     protected function defineDatabaseMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/test-migrations');
         $this->artisan('migrate', ['--database' => 'testing'])->run();
     }
 
     protected function defineRoutes($router): void
     {
         $router->middleware('web')->group(function () use ($router) {
-            $router->get('/protected', fn() => 'ok')->middleware('ms-auth');
+            $router->get('/protected', fn() => 'ok')->middleware('oidc-auth');
         });
     }
 }
