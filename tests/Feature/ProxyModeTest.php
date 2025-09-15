@@ -88,3 +88,31 @@ test('proxy disabled in with non-local redirect', function () {
     $this->get('/protected')
         ->assertRedirectContains('login.microsoftonline.com');
 });
+
+
+test('proxy enabled with existing user', function () {
+    $user = new \UaDevTeamPackages\EntraOidc\Models\OidcUser([
+        'id' => 'user-2',
+        'name' => 'Original User',
+        'email' => 'orig2@contoso.com',
+        'principal_name' => 'orig2@contoso.com',
+        'username' => 'somethingmadeup',
+    ]);
+
+    $user->save();
+    config()->set('entra-oidc.proxy.enabled', true);
+    config()->set('entra-oidc.proxy.principal', 'orig2@contoso.com');
+
+    // Local env and localhost redirect
+    putenv('APP_ENV=local');
+    config()->set('app.env', 'local');
+    config()->set('entra-oidc.azure.redirect', 'http://localhost/auth/callback');
+
+    $this->get('/protected')
+        ->assertOk()
+        ->assertSee('ok');
+
+    $this->assertTrue(Auth::guard('oidc')->check());
+    $this->assertSame('user-2', Auth::guard('oidc')->id());
+    $this->assertTrue((bool) session('ms:is-proxy'));
+});

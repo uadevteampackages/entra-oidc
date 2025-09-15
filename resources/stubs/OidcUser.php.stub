@@ -7,8 +7,6 @@ use UaDevTeamPackages\EntraOidc\Traits\ChecksEntraGroup;
 
 class OidcUser extends Authenticatable
 {
-    use ChecksEntraGroup;
-
     protected $table = 'oidc_users';
     public $timestamps = true;
     public $incrementing = false;

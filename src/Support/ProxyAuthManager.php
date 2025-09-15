@@ -60,16 +60,21 @@ class ProxyAuthManager
             session()->put('ms:real-user-id', Auth::guard('oidc')->id());
         }
 
-        /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
-        $user = $modelClass::query()->updateOrCreate(
-            ['id' => $id],
-            [
-                'name' => $name,
-                'email' => $email,
-                'principal_name' => $principal,
-                'username' => $username,
-            ]
-        );
+        // Try to find the user by principal_name
+        $user = $modelClass::query()->where('principal_name', $principal)->first();
+
+        if (!$user) {
+            /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
+            $user = $modelClass::query()->updateOrCreate(
+                ['id' => $id],
+                [
+                    'name' => $name,
+                    'email' => $email,
+                    'principal_name' => $principal,
+                    'username' => $username,
+                ]
+            );
+        }
 
         Auth::guard('oidc')->login($user);
         session()->put('ms:is-proxy', true);
