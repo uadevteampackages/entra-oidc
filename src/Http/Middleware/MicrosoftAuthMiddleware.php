@@ -10,7 +10,7 @@ use UaDevTeamPackages\EntraOidc\Support\ProxyAuthManager as Proxy;
 
 class MicrosoftAuthMiddleware
 {
-    public function handle(Request $request, Closure $next): \Symfony\Component\HttpFoundation\RedirectResponse|\Illuminate\Http\Response
+    public function handle(Request $request, Closure $next): \Symfony\Component\HttpFoundation\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         // Local-only proxy handling and restore
         if (Proxy::isLocalHost()) {
