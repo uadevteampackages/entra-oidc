@@ -12,6 +12,20 @@ test('guest is redirected to Azure', function () {
         ->assertRedirectContains('login.microsoftonline.com');
 });
 
+test('guest with Inertia request gets 409 with redirect header', function () {
+    Socialite::shouldReceive('driver->redirect')
+        ->andReturn(redirect('https://login.microsoftonline.com/common/oauth2/v2.0/authorize'));
+
+    $response = $this->withHeaders([
+        'X-Inertia' => true,
+        'X-Inertia-Version' => '1.0.0',
+    ])->get('/protected');
+
+    $response->assertStatus(409);
+    $response->assertHeader('X-Inertia-Location');
+    expect($response->headers->get('X-Inertia-Location'))->toContain('login.microsoftonline.com');
+});
+
 
 
 test('callback logs in and sets session', function () {
@@ -45,6 +59,32 @@ test('callback logs in and sets session', function () {
     $this->assertSame('jdoe', Auth::guard('oidc')->user()->username);
     $this->assertSame('John Doe', Auth::guard('oidc')->user()->name);
     $this->assertNotNull(session('entra_user_token_expires'));
+});
+
+test('expired session with Inertia request gets 409 with redirect header', function () {
+    Socialite::shouldReceive('driver->redirect')
+        ->andReturn(redirect('https://login.microsoftonline.com/common/oauth2/v2.0/authorize'));
+
+    $this->withSession([
+        'entra_user_token' => 'abc123',
+        'entra_user_token_expires' => now()->subHour(), // Expired token
+    ]);
+    Auth::guard('oidc')->login(new \UaDevTeamPackages\EntraOidc\Models\OidcUser([
+        'id' => 'user-1',
+        'name' => 'John Doe',
+        'email' => 'jdoe@contoso.com',
+        'principal_name' => 'jdoe@contoso.com',
+        'username' => 'jdoe',
+    ]));
+
+    $response = $this->withHeaders([
+        'X-Inertia' => true,
+        'X-Inertia-Version' => '1.0.0',
+    ])->get('/protected');
+
+    $response->assertStatus(409);
+    $response->assertHeader('X-Inertia-Location');
+    expect($response->headers->get('X-Inertia-Location'))->toContain('login.microsoftonline.com');
 });
 
 test('group check calls Graph', function () {

@@ -33,13 +33,33 @@ class MicrosoftAuthMiddleware
             if (session()->get('entra_user_token_expires') && session()->get('entra_user_token_expires') < now()) {
                 // Persist the intended URL so we can redirect after SSO completes
                 session()->put('sso_redirect_url', url()->current());
-                return \Laravel\Socialite\Facades\Socialite::driver('azure')->redirect();
+                return $this->redirectToAuth($request);
             }
             return $next($request);
         }
 
         // Persist the intended URL so we can redirect after SSO completes
         session()->put('sso_redirect_url', url()->current());
-        return \Laravel\Socialite\Facades\Socialite::driver('azure')->redirect();
+        return $this->redirectToAuth($request);
+    }
+
+    /**
+     * Handle redirect to Microsoft authentication
+     * Detects Inertia requests and returns appropriate response to avoid CORS errors
+     */
+    protected function redirectToAuth(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Illuminate\Http\JsonResponse
+    {
+        $redirectUrl = \Laravel\Socialite\Facades\Socialite::driver('azure')->redirect()->getTargetUrl();
+
+        // Check if this is an Inertia request
+        if ($request->header('X-Inertia')) {
+            // Return 409 Conflict with X-Inertia-Location header
+            // This tells Inertia to perform a full page redirect instead of XHR
+            return response()->json(['message' => 'Authentication required'], 409)
+                ->header('X-Inertia-Location', $redirectUrl);
+        }
+
+        // For regular requests, just redirect
+        return redirect($redirectUrl);
     }
 }

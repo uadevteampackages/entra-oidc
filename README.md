@@ -120,6 +120,11 @@ php artisan vendor:publish --tag=entra-oidc-config
 'user_model' => App\Models\OidcUser::class,
 ```
 
+## Inertia.js compatibility
+This package is fully compatible with Inertia.js applications. When a session expires or authentication is required, the middleware automatically detects Inertia requests (via the `X-Inertia` header) and returns a proper response that triggers a full-page redirect instead of attempting an XHR redirect. This prevents CORS errors that would otherwise occur when trying to redirect to Microsoft's OAuth endpoints.
+
+No additional configuration is required - the middleware handles this automatically.
+
 ## Route caching
 Routes are controller-based and cache-friendly. After configuring your app, you can safely run:
 ```bash
